@@ -6,6 +6,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import pages.LoginPage;
 import utils.BaseTest;
+import utils.ConfigReader;
 
 import java.time.Duration;
 
@@ -17,7 +18,7 @@ public class LoginTest extends BaseTest {
     @Test
     public void validateLoginTest(){
         loginPage = new LoginPage(driver);
-        loginPage.login("standard_user","secret_sauce");
+        loginPage.login(ConfigReader.get("username"),ConfigReader.get("password"));
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.urlContains("/inventory.html"));

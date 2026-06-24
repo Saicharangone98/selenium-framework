@@ -11,7 +11,7 @@ public class BaseTest {
     @BeforeMethod
     public void setupDriver() {
         driver = DriverFactory.getDriver();
-        driver.get("https://www.saucedemo.com/");
+        driver.get(ConfigReader.get("baseUrl"));
     }
 
     @AfterMethod
