@@ -26,4 +26,15 @@ public class LoginTest extends BaseTest {
         Assert.assertTrue(driver.getCurrentUrl().endsWith("/inventory.html"),"LOGIN FAILED");
     }
 
+    @Test
+    public void validateLoginWithInvalidCreds(){
+        loginPage = new LoginPage(driver);
+        loginPage.login(ConfigReader.get("invalidUsername"),ConfigReader.get("invalidPassword"));
+
+        WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(loginPage.getErrorLocator()));
+
+        Assert.assertEquals(loginPage.getErrorText(),"Epic sadface: Username and password do not match any user in this service");
+    }
+
 }

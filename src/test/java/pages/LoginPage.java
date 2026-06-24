@@ -10,6 +10,7 @@ public class LoginPage {
     By userName = By.id("user-name");
     By password = By.id("password");
     By loginButton = By.id("login-button");
+    By loginErrorBox = By.cssSelector("[data-test='error']");
 
 
     public LoginPage(WebDriver driver){
@@ -32,6 +33,14 @@ public class LoginPage {
         enterUserName(userName);
         enterPassword(password);
         clickLoginButton();
+    }
+
+    public String getErrorText(){
+        return driver.findElement(loginErrorBox).getText();
+    }
+
+    public By getErrorLocator(){
+        return loginErrorBox;
     }
 
 }
