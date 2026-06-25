@@ -22,5 +22,15 @@
             <version>7.10.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache</groupId>
+            <artifactId>apache</artifactId>
+            <version>37</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.21.0</version>
+        </dependency>
     </dependencies>
 </project>
