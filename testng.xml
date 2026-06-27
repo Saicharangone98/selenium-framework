@@ -1,0 +1,8 @@
+<suite name="Learning Test framework" thread-count="3" verbose="2">
+    <!-- Test Block 1: Running targeted classes and methods -->
+    <test name="Login flow">
+        <classes>
+            <class name="tests.LoginTest"/>
+        </classes>
+    </test>
+</suite>
