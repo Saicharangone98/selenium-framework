@@ -22,8 +22,7 @@ public class LoginTest extends BaseTest {
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.urlContains("/inventory.html"));
-
-        Assert.assertTrue(driver.getCurrentUrl().endsWith("/inventory.html"),"LOGIN FAILED");
+        Assert.assertTrue(driver.getCurrentUrl().endsWith("/inventories.html"),"LOGIN FAILED");
     }
 
     @Test

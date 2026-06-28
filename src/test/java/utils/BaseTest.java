@@ -3,17 +3,20 @@ package utils;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Listeners;
 
-@Listeners(utils.Listeners.class)
 public class BaseTest {
 
     protected WebDriver driver;
 
     @BeforeMethod
     public void setupDriver() {
-        driver = DriverFactory.getDriver();
-        driver.get(ConfigReader.get("baseUrl"));
+        try {
+            driver = DriverFactory.getDriver();
+            driver.get(ConfigReader.get("baseUrl"));
+        } catch (Exception e) {
+            System.out.println("BEFOREMETHOD FAILED: " + e.getMessage());
+            throw e;
+        }
     }
 
     @AfterMethod

@@ -3,14 +3,15 @@ package utils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.testng.ITestListener;
-import org.testng.ITestResult;
+import org.testng.*;
 import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Listeners implements ITestListener {
+import static utils.ExtentReportManager.*;
+
+public class Listeners implements ITestListener, ISuiteListener{
 
     @Override
     public void onTestFailure(ITestResult result){
@@ -31,7 +32,33 @@ public class Listeners implements ITestListener {
         }catch(Exception e){
             e.printStackTrace();
         }
+        if (ExtentReportManager.getTest() != null) {
+            ExtentReportManager.getTest().fail(result.getThrowable());
+            ExtentReportManager.getTest().addScreenCaptureFromPath(filePath,"TEST FAILED - "+methodName);
+        } else {
+            System.out.println("ExtentTest null - BeforeMethod likely failed: "
+                    + result.getThrowable().getMessage());
+        }
 
     }
 
+    @Override
+    public void onStart(ISuite suite) {
+        initReport();
+    }
+
+    @Override
+    public void onTestStart(ITestResult result) {
+        createTest(result.getMethod().getMethodName());
+    }
+
+    @Override
+    public void onTestSuccess(ITestResult result) {
+        getTest().pass(result.getMethod().getMethodName());
+    }
+
+    @Override
+    public void onFinish(ISuite suite) {
+        flushReport();
+    }
 }
