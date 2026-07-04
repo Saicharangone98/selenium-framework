@@ -1,6 +1,12 @@
 Feature: Login functionality for SauceDemo
 
-  Scenario: Valid login with correct credentials
+  Scenario Outline: Valid login with different credentials
     Given User is on the login page
-    When User enters username "standard_user" and password "secret_sauce"
-    Then User should be redirected to the inventory page
+    When User enters username "<UserName>" and password "<Password>"
+    Then "<ExpectedOutCome>"
+    Examples:
+      | UserName      | Password     | ExpectedOutCome                                                           |
+      | standard_user | secret_sauce | redirect                                                                  |
+      | Saicharan     | User@12345   | Epic sadface: Username and password do not match any user in this service |
+      |               |              | Epic sadface: Username is required                                        |
+      | Charan001     |              | Epic sadface: Password is required                                        |

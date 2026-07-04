@@ -21,7 +21,7 @@ public class LoginSteps {
     WebDriver driver;
 
     @Before
-    public void setup(){
+    public void setup() {
         driver = DriverFactory.getDriver();
     }
 
@@ -33,7 +33,7 @@ public class LoginSteps {
     @When("User enters username {string} and password {string}")
     public void userEntersUsernameAndPassword(String userName, String password) {
         loginPage = new LoginPage(driver);
-        loginPage.login(userName,password);
+        loginPage.login(userName, password);
     }
 
     @Then("User should be redirected to the inventory page")
@@ -41,12 +41,23 @@ public class LoginSteps {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.urlContains("/inventory.html"));
 
-        Assert.assertTrue(driver.getCurrentUrl().endsWith("/inventory.html"),"LOGIN FAILED");
+        Assert.assertTrue(driver.getCurrentUrl().endsWith("/inventory.html"), "LOGIN FAILED");
     }
+
     @After
-    public void tearDown(){
+    public void tearDown() {
         DriverFactory.quitDriver();
     }
 
-
+    @Then("{string}")
+    public void validateLogin(String expectedOutput) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        if (expectedOutput.equals("redirect")) {
+            wait.until(ExpectedConditions.urlContains("/inventory.html"));
+            Assert.assertTrue(driver.getCurrentUrl().endsWith("/inventory.html"), "LOGIN FAILED");
+        } else {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(loginPage.getErrorLocator()));
+            Assert.assertEquals(loginPage.getErrorText(), expectedOutput);
+        }
+    }
 }
