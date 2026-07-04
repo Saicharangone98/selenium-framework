@@ -13,10 +13,8 @@ import static utils.ExtentReportManager.*;
 
 public class Listeners implements ITestListener, ISuiteListener{
 
-    @Override
-    public void onTestFailure(ITestResult result){
+    public String takeScreenShot(String methodName){
         WebDriver driver = DriverFactory.getDriver();
-        String methodName = result.getMethod().getMethodName();
 
         String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
 
@@ -32,9 +30,16 @@ public class Listeners implements ITestListener, ISuiteListener{
         }catch(Exception e){
             e.printStackTrace();
         }
+        return filePath;
+    }
+    @Override
+    public void onTestFailure(ITestResult result){
+        String methodName = result.getMethod().getMethodName();
+        String screenshot = takeScreenShot(methodName);
+
         if (ExtentReportManager.getTest() != null) {
             ExtentReportManager.getTest().fail(result.getThrowable());
-            ExtentReportManager.getTest().addScreenCaptureFromPath(filePath,"TEST FAILED - "+methodName);
+            ExtentReportManager.getTest().addScreenCaptureFromPath(screenshot,"TEST FAILED - "+methodName);
         } else {
             System.out.println("ExtentTest null - BeforeMethod likely failed: "
                     + result.getThrowable().getMessage());
@@ -49,12 +54,20 @@ public class Listeners implements ITestListener, ISuiteListener{
 
     @Override
     public void onTestStart(ITestResult result) {
-        createTest(result.getMethod().getMethodName());
+        Object[] parameters = result.getParameters();
+        String testName = result.getMethod().getMethodName();
+        if (parameters != null && parameters.length > 0) {
+            // Cucumber passes PickleWrapper as first parameter
+            testName = parameters[0] instanceof io.cucumber.testng.PickleWrapper
+                    ? ((io.cucumber.testng.PickleWrapper) parameters[0]).getPickle().getName()
+                    : result.getMethod().getMethodName();
+        }
+        createTest(testName);
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        getTest().pass(result.getMethod().getMethodName());
+        getTest().pass("TEST PASSED");
     }
 
     @Override
