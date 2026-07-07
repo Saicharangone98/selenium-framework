@@ -11,9 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Run tests
-      - run: mvn test -Dheadless=true
-
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -23,8 +20,14 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Install Chrome
+        run: |
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
       - name: Run tests
-        run: mvn test
+        run: mvn test -Dheadless=true
 
       - name: Upload test reports
         uses: actions/upload-artifact@v3
