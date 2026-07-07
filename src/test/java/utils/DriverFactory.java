@@ -14,7 +14,8 @@ public class DriverFactory {
         if(driver.get()==null){
             WebDriver webDriver;
             String headless = System.getProperty("headless", ConfigReader.get("runHeadless"));
-            if("true".equals(ConfigReader.get(headless))){
+            boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
+            if("true".equals(ConfigReader.get(headless)) || isLinux){
                 ChromeOptions options = new ChromeOptions();
                 options.addArguments("--headless=new");
                 options.addArguments("--no-sandbox");
