@@ -39,4 +39,15 @@ public class CustomerApiTest extends BaseApiTest {
         Assert.assertEquals(responseBody,"Could not find customer #99999","Invalid response");
 
     }
+
+    @Test
+    public void validateValidAcounts(){
+        Response response = given()
+                .baseUri(BASE_URL)
+                .when()
+                .get("/customers/12212/accounts");
+
+        String responseBody = response.getBody().xmlPath().getString("accounts.account");
+        System.out.println(responseBody);
+    }
 }
