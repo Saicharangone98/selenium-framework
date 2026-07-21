@@ -1,8 +1,6 @@
 package stepdefinitions;
 
 import io.cucumber.java.After;
-import io.cucumber.java.Before;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -13,16 +11,18 @@ import org.testng.Assert;
 import pages.LoginPage;
 import utils.ConfigReader;
 import utils.DriverFactory;
+import utils.TestContext;
 
 import java.time.Duration;
 
 public class LoginSteps {
-    LoginPage loginPage;
-    WebDriver driver;
+    private final LoginPage loginPage;
+    private final WebDriver driver;
 
-    @Before
-    public void setup() {
-        driver = DriverFactory.getDriver();
+    // PicoContainer automatically initializes and passes TestContext here
+    public LoginSteps(TestContext context) {
+        this.loginPage = context.getLoginPage();
+        this.driver = DriverFactory.getDriver();
     }
 
     @Given("User is on the login page")
@@ -32,7 +32,6 @@ public class LoginSteps {
 
     @When("User enters username {string} and password {string}")
     public void userEntersUsernameAndPassword(String userName, String password) {
-        loginPage = new LoginPage(driver);
         loginPage.login(userName, password);
     }
 
