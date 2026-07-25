@@ -32,4 +32,5 @@ public class InventorySteps {
     public void theCartBadgeCountShouldBe(String expectedCount) {
         Assert.assertEquals(inventoryPage.getCartBadgeCount(),expectedCount);
     }
+
 }
