@@ -32,6 +32,11 @@ public class Listeners implements ITestListener, ISuiteListener{
         }
         return filePath;
     }
+    public String takeScreenShotAsBase64String(String methodName){
+        WebDriver driver = DriverFactory.getDriver();
+        String base64Screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.BASE64);
+        return base64Screenshot;
+    }
     @Override
     public void onTestFailure(ITestResult result){
         String methodName = result.getMethod().getMethodName();
@@ -39,7 +44,7 @@ public class Listeners implements ITestListener, ISuiteListener{
 
         if (ExtentReportManager.getTest() != null) {
             ExtentReportManager.getTest().fail(result.getThrowable());
-            ExtentReportManager.getTest().addScreenCaptureFromPath(screenshot,"TEST FAILED - "+methodName);
+            ExtentReportManager.getTest().addScreenCaptureFromPath(takeScreenShotAsBase64String(methodName),"TEST FAILED - "+methodName);
         } else {
             System.out.println("ExtentTest null - BeforeMethod likely failed: "
                     + result.getThrowable().getMessage());

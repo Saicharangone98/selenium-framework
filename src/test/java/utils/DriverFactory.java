@@ -41,11 +41,8 @@ public class DriverFactory {
                 options.addArguments("--headless=new");
                 options.addArguments("--no-sandbox");
                 options.addArguments("--disable-dev-shm-usage");
-                webDriver = new ChromeDriver(options);
-            }else{
-                webDriver = new ChromeDriver(options);
             }
-
+            webDriver = new ChromeDriver(options);
             webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
             webDriver.manage().window().maximize();
             driver.set(webDriver);

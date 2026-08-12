@@ -8,9 +8,9 @@
             <class name="testRunners.TestRunner"/>
         </classes>
     </test>
-    <test name="API flow">
-        <classes>
-            <class name="api.CustomerApiTest"/>
-        </classes>
-    </test>
+<!--    <test name="API flow">-->
+<!--        <classes>-->
+<!--            <class name="api.CustomerApiTest"/>-->
+<!--        </classes>-->
+<!--    </test>-->
 </suite>

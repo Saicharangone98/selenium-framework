@@ -81,6 +81,11 @@
             <version>7.33.0</version> <!-- MUST match io.cucumber:cucumber-java version -->
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>tech.grasshopper</groupId>
+            <artifactId>extentreports-cucumber7-adapter</artifactId>
+            <version>1.14.0</version>
+        </dependency>
     </dependencies>
 
 </project>

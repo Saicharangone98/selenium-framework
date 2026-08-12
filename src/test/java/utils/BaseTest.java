@@ -8,7 +8,7 @@ public class BaseTest {
 
     protected WebDriver driver;
 
-    @BeforeMethod
+//    @BeforeMethod
     public void setupDriver() {
         try {
             driver = DriverFactory.getDriver();
@@ -19,8 +19,9 @@ public class BaseTest {
         }
     }
 
-    @AfterMethod
+//    @AfterMethod
     public void tearDownDriver() {
+        System.out.println("Base Test - TearDown");
         DriverFactory.quitDriver();
     }
 

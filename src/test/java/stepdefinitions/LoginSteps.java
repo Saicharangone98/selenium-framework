@@ -43,11 +43,6 @@ public class LoginSteps {
         Assert.assertTrue(driver.getCurrentUrl().endsWith("/inventory.html"), "LOGIN FAILED");
     }
 
-    @After
-    public void tearDown() {
-        DriverFactory.quitDriver();
-    }
-
     @Then("{string}")
     public void validateLogin(String expectedOutput) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
