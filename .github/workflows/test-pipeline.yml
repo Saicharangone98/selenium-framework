@@ -27,7 +27,7 @@ jobs:
           mvn clean test \
             -Dheadless=true \
             -Denv=qa \
-            -DsuiteXmlFile=src/test/resources/testng.xml
+            -DsuiteXmlFile=testng.xml
 
       - name: Archive Test Reports
         if: always() # Executes even if tests fail so reports can be examined
