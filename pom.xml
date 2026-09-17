@@ -27,12 +27,27 @@
                     <argLine>-Dheadless=${headless}</argLine>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <systemPropertyVariables>
+                        <env>${env}</env>
+                        <headless>${headless}</headless>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <headless>false</headless>
+        <env>qa</env>
     </properties>
     <dependencies>
         <dependency>
@@ -98,5 +113,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

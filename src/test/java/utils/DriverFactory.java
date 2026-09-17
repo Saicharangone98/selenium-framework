@@ -36,11 +36,13 @@ public class DriverFactory {
             WebDriver webDriver;
             String headless = System.getProperty("headless", ConfigReader.get("runHeadless"));
             boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
-            if("true".equals(ConfigReader.get(headless)) || isLinux){
+            boolean isHeadless = Boolean.parseBoolean(System.getProperty("headless", "false"));
+            if("true".equals(ConfigReader.get(headless)) || isLinux || isHeadless){
 
                 options.addArguments("--headless=new");
                 options.addArguments("--no-sandbox");
                 options.addArguments("--disable-dev-shm-usage");
+                options.addArguments("--window-size=1920,1080");
             }
             webDriver = new ChromeDriver(options);
             webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
