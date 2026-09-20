@@ -21,4 +21,4 @@ Feature: Login functionality for SauceDemo
   Scenario: Intentional failure to test screenshot logging
     Given User is on the login page
     When User enters username "standard_user" and password "wrong_password"
-#    Then User should see the products header "Products"
+    Then User should see the products header "Products"

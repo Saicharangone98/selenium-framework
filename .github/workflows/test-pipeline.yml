@@ -38,3 +38,35 @@ jobs:
             test-output/SparkReport/
             target/cucumber-reports/
           retention-days: 7
+
+      - name: Publish Test Summary
+        if: always()
+        run: |
+          echo "## 🧪 Automated Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Details |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Branch** | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Triggered By** | @${{ github.actor }} \vert{}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "| **Overall Status** | 🟢 PASSED |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| **Overall Status** | 🔴 FAILED |" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Reports & Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "Interactive **Spark Extent Report** and **Cucumber HTML Report** are archived below in the **Artifacts** section." >> $GITHUB_STEP_SUMMARY
+
+      - name: Alert on Failure
+        if: failure()
+        env:
+          WEBHOOK_URL: ${{ secrets.NOTIFICATION_WEBHOOK_URL }}
+        run: |
+          if [ -n "$WEBHOOK_URL" ]; then
+            curl -X POST -H 'Content-type: application/json' \
+              --data "{\"text\":\"🚨 *Enterprise Automation Suite Failed!* \n• *Branch:* \`${{ github.ref_name }}\` \n• *Commit:* \`${{ github.sha }}\` \n• *Author:* ${{ github.actor }} \n• *Run Link:* https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+              $WEBHOOK_URL
+          else
+            echo "ℹ️ No NOTIFICATION_WEBHOOK_URL secret configured. Skipping webhook alert."
+          fi
