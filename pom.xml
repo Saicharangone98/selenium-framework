@@ -112,5 +112,19 @@
             <version>5.4.0</version>
             <scope>test</scope>
         </dependency>
+            <!-- JDBC Driver (H2 for embedded/demo verification; replace with mysql/postgres for production) -->
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>2.2.224</version>
+                <scope>test</scope>
+            </dependency>
+        <!-- JDBC Driver (H2 for embedded/demo verification; replace with mysql/postgres for production) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.2.224</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

@@ -2,6 +2,7 @@ package utils;
 
 import api.BaseApi;
 import io.cucumber.java.After;
+import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.restassured.RestAssured;
@@ -51,5 +52,11 @@ public class Hooks extends BaseTest {
             }
         }
         tearDownDriver();
+    }
+
+    @AfterAll
+    public static void cleanUpDatabaseConnections() {
+        DatabaseManager.closeConnection();
+        System.out.println("🔌 Database connections cleanly closed.");
     }
 }
