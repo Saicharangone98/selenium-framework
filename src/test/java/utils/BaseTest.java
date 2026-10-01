@@ -1,8 +1,6 @@
 package utils;
 
 import org.openqa.selenium.WebDriver;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 
 public class BaseTest {
 
@@ -12,7 +10,7 @@ public class BaseTest {
     public void setupDriver() {
         try {
             driver = DriverFactory.getDriver();
-            driver.get(ConfigReader.get("baseUrl"));
+            driver.get(ConfigReader.getProperty("baseUrl"));
         } catch (Exception e) {
             System.out.println("BEFOREMETHOD FAILED: " + e.getMessage());
             throw e;

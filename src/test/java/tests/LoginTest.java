@@ -18,7 +18,7 @@ public class LoginTest extends BaseTest {
     @Test
     public void validateLoginTest(){
         loginPage = new LoginPage(driver);
-        loginPage.login(ConfigReader.get("username"),ConfigReader.get("password"));
+        loginPage.login(ConfigReader.getProperty("username"),ConfigReader.getProperty("password"));
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.urlContains("/inventory.html"));
@@ -28,7 +28,7 @@ public class LoginTest extends BaseTest {
     @Test
     public void validateLoginWithInvalidCreds(){
         loginPage = new LoginPage(driver);
-        loginPage.login(ConfigReader.get("invalidUsername"),ConfigReader.get("invalidPassword"));
+        loginPage.login(ConfigReader.getProperty("invalidUsername"),ConfigReader.getProperty("invalidPassword"));
 
         WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOfElementLocated(loginPage.getErrorLocator()));

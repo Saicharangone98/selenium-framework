@@ -1,6 +1,5 @@
 package stepdefinitions;
 
-import io.cucumber.java.After;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -27,7 +26,7 @@ public class LoginSteps {
 
     @Given("User is on the login page")
     public void userIsOnTheLoginPage() {
-        driver.get(ConfigReader.get("baseUrl"));
+        driver.get(ConfigReader.getProperty("baseUrl"));
     }
 
     @When("User enters username {string} and password {string}")

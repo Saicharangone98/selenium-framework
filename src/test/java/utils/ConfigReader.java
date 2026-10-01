@@ -19,7 +19,7 @@ public class ConfigReader {
         }
     }
 
-    public static String get(String key){
+    public static String getProperty(String key){
         String sysProp = System.getProperty(key);
         if (sysProp != null && !sysProp.isBlank()) {
             return sysProp; // Allows overriding individual keys via CLI: -Dui.base.url=...

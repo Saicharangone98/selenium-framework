@@ -15,14 +15,14 @@ public class DatabaseManager {
 
     private static Connection connection;
 
-    private static final String DB_URL = ConfigReader.get("db.url") != null
-            ? ConfigReader.get("db.url")
+    private static final String DB_URL = ConfigReader.getProperty("db.url") != null
+            ? ConfigReader.getProperty("db.url")
             : "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1";
-    private static final String DB_USER = ConfigReader.get("db.user") != null
-            ? ConfigReader.get("db.user")
+    private static final String DB_USER = ConfigReader.getProperty("db.user") != null
+            ? ConfigReader.getProperty("db.user")
             : "sa";
-    private static final String DB_PASSWORD = ConfigReader.get("db.password") != null
-            ? ConfigReader.get("db.password")
+    private static final String DB_PASSWORD = ConfigReader.getProperty("db.password") != null
+            ? ConfigReader.getProperty("db.password")
             : "";
 
     public static synchronized Connection getConnection() throws SQLException {

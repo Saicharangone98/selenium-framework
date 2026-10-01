@@ -3,60 +3,84 @@ package utils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
-import java.time.Duration;
-import java.util.Collections;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DriverFactory {
 
-    private static ThreadLocal<WebDriver> driver=new ThreadLocal<>();
+    private static final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
-    public static WebDriver getDriver(){
-        if(driver.get()==null){
-            ChromeOptions options = new ChromeOptions();
-            // 1. Force Guest Mode (Disables Password Manager & User Profiles entirely)
-            options.addArguments("--guest");
-
-            // 2. Hide automation notification bar
-            options.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
-            Map<String, Object> prefs = new HashMap<>();
-            prefs.put("credentials_enable_service", false);
-            prefs.put("profile.password_manager_enabled", false);
-            prefs.put("autofill.profile_enabled", false);
-            prefs.put("autofill.credit_card_enabled", false);
-            options.setExperimentalOption("prefs", prefs);
-
-            // 2. Disable Chrome info bars, notification popups & password leak detection
-            options.addArguments("--disable-infobars");
-            options.addArguments("--disable-notifications");
-            options.addArguments("--disable-popup-blocking");
-            options.addArguments("--disable-save-password-bubble");
-            WebDriver webDriver;
-            String headless = System.getProperty("headless", ConfigReader.get("runHeadless"));
-            boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
-            boolean isHeadless = Boolean.parseBoolean(System.getProperty("headless", "false"));
-            if("true".equals(ConfigReader.get(headless)) || isLinux || isHeadless){
-
-                options.addArguments("--headless=new");
-                options.addArguments("--no-sandbox");
-                options.addArguments("--disable-dev-shm-usage");
-                options.addArguments("--window-size=1920,1080");
-            }
-            webDriver = new ChromeDriver(options);
-            webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-            webDriver.manage().window().maximize();
-            driver.set(webDriver);
+    public static WebDriver getDriver() {
+        if (driver.get() == null) {
+            driver.set(createDriverInstance());
         }
         return driver.get();
     }
 
-    public static void quitDriver(){
-        if (driver.get()!=null){
+    private static WebDriver createDriverInstance() {
+        String executionMode = ConfigReader.getProperty("execution.mode").toLowerCase();
+        String browser = ConfigReader.getProperty("browser").toLowerCase();
+        boolean isHeadless = Boolean.parseBoolean(System.getProperty("headless", "false"));
+
+        if ("grid".equals(executionMode)) {
+            return createRemoteDriver(browser, isHeadless);
+        } else {
+            return createLocalDriver(browser, isHeadless);
+        }
+    }
+
+    private static WebDriver createLocalDriver(String browser, boolean isHeadless) {
+        if ("firefox".equals(browser)) {
+            FirefoxOptions options = new FirefoxOptions();
+            if (isHeadless) options.addArguments("-headless");
+            return new FirefoxDriver(options);
+        } else {
+            return new ChromeDriver(getChromeOptions(isHeadless));
+        }
+    }
+
+    private static WebDriver createRemoteDriver(String browser, boolean isHeadless) {
+        String gridUrlStr = ConfigReader.getProperty("grid.url");
+        try {
+            URL gridUrl = URI.create(gridUrlStr).toURL();
+            if ("firefox".equals(browser)) {
+                FirefoxOptions options = new FirefoxOptions();
+                if (isHeadless) options.addArguments("-headless");
+                return new RemoteWebDriver(gridUrl, options);
+            } else {
+                return new RemoteWebDriver(gridUrl, getChromeOptions(isHeadless));
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Invalid Selenium Grid URL: " + gridUrlStr, e);
+        }
+    }
+
+    private static ChromeOptions getChromeOptions(boolean isHeadless) {
+        ChromeOptions options = new ChromeOptions();
+        if (isHeadless) {
+            options.addArguments("--headless=new");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--window-size=1920,1080");
+        }
+        Map<String, Object> prefs = new HashMap<>();
+        prefs.put("credentials_enable_service", false);
+        prefs.put("profile.password_manager_leak_detection", false);
+        options.setExperimentalOption("prefs", prefs);
+        return options;
+    }
+
+    public static void quitDriver() {
+        if (driver.get() != null) {
             driver.get().quit();
             driver.remove();
         }
     }
-
 }

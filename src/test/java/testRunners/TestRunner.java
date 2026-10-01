@@ -10,7 +10,7 @@ import org.testng.annotations.DataProvider;
         "json:target/cucumber-reports.json",
         "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:"},
         monochrome = true,
-        tags = "@test_failure",
+        tags = "@regression",
         dryRun = false)
 public class TestRunner extends AbstractTestNGCucumberTests {
 
