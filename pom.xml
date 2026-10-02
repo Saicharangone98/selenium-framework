@@ -126,5 +126,12 @@
             <version>2.2.224</version>
             <scope>test</scope>
         </dependency>
+        <!-- WireMock for HTTP Service Virtualization & Mocking -->
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock</artifactId>
+            <version>3.13.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
