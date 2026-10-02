@@ -1,18 +1,18 @@
-name: Automation Regression Pipeline
+name: CI Smoke Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+    branches: [ main ]
 
 jobs:
-  test:
+  smoke-tests:
+    name: Build & Smoke Check
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up JDK 21
@@ -20,53 +20,22 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: maven
+          cache: 'maven'
 
-      - name: Run Hybrid Test Suite
+      - name: Run Build and Smoke Tests
         run: |
           mvn clean test \
-            -Dheadless=true \
             -Denv=qa \
-            -DsuiteXmlFile=testng.xml
+            -Dheadless=true \
+            -Dexecution.mode=local \
+            -DsuiteXmlFile=src/test/resources/testng.xml
 
-      - name: Archive Test Reports
-        if: always() # Executes even if tests fail so reports can be examined
+      - name: Upload Smoke Test Artifacts
         uses: actions/upload-artifact@v4
-        with:
-          name: execution-reports
-          path: |
-            test-output/SparkReport/
-            target/cucumber-reports/
-          retention-days: 7
-
-      - name: Publish Test Summary
         if: always()
-        run: |
-          echo "## 🧪 Automated Test Execution Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Metric | Details |" >> $GITHUB_STEP_SUMMARY
-          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Branch** | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Commit** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Triggered By** | @${{ github.actor }} \vert{}" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "| **Overall Status** | 🟢 PASSED |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| **Overall Status** | 🔴 FAILED |" >> $GITHUB_STEP_SUMMARY
-          fi
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📊 Reports & Artifacts" >> $GITHUB_STEP_SUMMARY
-          echo "Interactive **Spark Extent Report** and **Cucumber HTML Report** are archived below in the **Artifacts** section." >> $GITHUB_STEP_SUMMARY
-
-      - name: Alert on Failure
-        if: failure()
-        env:
-          WEBHOOK_URL: ${{ secrets.NOTIFICATION_WEBHOOK_URL }}
-        run: |
-          if [ -n "$WEBHOOK_URL" ]; then
-            curl -X POST -H 'Content-type: application/json' \
-              --data "{\"text\":\"🚨 *Enterprise Automation Suite Failed!* \n• *Branch:* \`${{ github.ref_name }}\` \n• *Commit:* \`${{ github.sha }}\` \n• *Author:* ${{ github.actor }} \n• *Run Link:* https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
-              $WEBHOOK_URL
-          else
-            echo "ℹ️ No NOTIFICATION_WEBHOOK_URL secret configured. Skipping webhook alert."
-          fi
+        with:
+          name: smoke-test-reports
+          path: |
+            test-output/
+            target/surefire-reports/
+          retention-days: 7
