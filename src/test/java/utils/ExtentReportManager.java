@@ -29,7 +29,7 @@ public class ExtentReportManager {
     }
 
     // Called at start of each @Test — creates one entry in the report
-    public static void createTest(String testName) {
+    public static void createTest(String testName, String description) {
         ExtentTest test = extent.createTest(testName);
         extentTest.set(test); // store per thread
     }

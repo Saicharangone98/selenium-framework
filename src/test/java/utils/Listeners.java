@@ -1,82 +1,72 @@
 package utils;
 
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
+import com.aventstack.extentreports.MediaEntityBuilder;
+import com.aventstack.extentreports.Status;
 import org.openqa.selenium.WebDriver;
 import org.testng.*;
-import org.apache.commons.io.FileUtils;
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import static utils.ExtentReportManager.*;
 
-public class Listeners implements ITestListener, ISuiteListener{
-
-    public String takeScreenShot(String methodName){
-        WebDriver driver = DriverFactory.getDriver();
-
-        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
-
-        String directoryPath = System.getProperty("user.dir")+ File.separator+"target"+File.separator+"Screenshot"+File.separator;
-        String filePath = directoryPath + methodName + timeStamp+".png";
-
-        new File(directoryPath).mkdirs();
-
-        File srcFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-        try {
-            FileUtils.copyFile(srcFile, new File(filePath));
-            System.out.println("Screenshot saved at: " + filePath);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return filePath;
-    }
-    public String takeScreenShotAsBase64String(String methodName){
-        WebDriver driver = DriverFactory.getDriver();
-        String base64Screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.BASE64);
-        return base64Screenshot;
-    }
-    @Override
-    public void onTestFailure(ITestResult result){
-        String methodName = result.getMethod().getMethodName();
-        String screenshot = takeScreenShot(methodName);
-
-        if (ExtentReportManager.getTest() != null) {
-            ExtentReportManager.getTest().fail(result.getThrowable());
-            ExtentReportManager.getTest().addScreenCaptureFromPath(takeScreenShotAsBase64String(methodName),"TEST FAILED - "+methodName);
-        } else {
-            System.out.println("ExtentTest null - BeforeMethod likely failed: "
-                    + result.getThrowable().getMessage());
-        }
-
-    }
+public class Listeners implements ITestListener, ISuiteListener {
 
     @Override
     public void onStart(ISuite suite) {
-        initReport();
-    }
-
-    @Override
-    public void onTestStart(ITestResult result) {
-        Object[] parameters = result.getParameters();
-        String testName = result.getMethod().getMethodName();
-        if (parameters != null && parameters.length > 0) {
-            // Cucumber passes PickleWrapper as first parameter
-            testName = parameters[0] instanceof io.cucumber.testng.PickleWrapper
-                    ? ((io.cucumber.testng.PickleWrapper) parameters[0]).getPickle().getName()
-                    : result.getMethod().getMethodName();
-        }
-        createTest(testName);
-    }
-
-    @Override
-    public void onTestSuccess(ITestResult result) {
-        getTest().pass("TEST PASSED");
+        ExtentReportManager.initReport();
     }
 
     @Override
     public void onFinish(ISuite suite) {
-        flushReport();
+        ExtentReportManager.flushReport();
+    }
+
+    @Override
+    public void onTestStart(ITestResult result) {
+        ExtentReportManager.createTest(result.getMethod().getMethodName(),
+                result.getMethod().getDescription());
+    }
+
+    @Override
+    public void onTestSuccess(ITestResult result) {
+        ExtentReportManager.getTest().log(Status.PASS, "Test Passed Successfully");
+    }
+
+    @Override
+    public void onTestFailure(ITestResult result) {
+        String methodName = result.getMethod().getMethodName();
+        Throwable throwable = result.getThrowable();
+
+        // 1. Log failure status and exception trace
+        ExtentReportManager.getTest().log(Status.FAIL, "Test Failed: " + methodName);
+        if (throwable != null) {
+            ExtentReportManager.getTest().fail(throwable);
+        }
+
+        // 2. Fetch driver safely from the current thread
+        WebDriver driver = DriverFactory.getDriver();
+
+        if (driver != null) {
+            // Option A: Base64 embedded directly inside the single HTML report
+            String base64Screenshot = ScreenshotUtils.captureBase64(driver);
+            if (base64Screenshot != null) {
+                ExtentReportManager.getTest().fail("Failure Snapshot (Embedded):",
+                        MediaEntityBuilder.createScreenCaptureFromBase64String(base64Screenshot).build());
+            }
+
+            // Option B: Save as a disk asset for pipeline artifact bundle
+            String filePath = ScreenshotUtils.captureToFile(driver, methodName);
+            if (filePath != null) {
+                System.out.println("📸 Screenshot saved to file: " + filePath);
+            }
+        } else {
+            ExtentReportManager.getTest().log(Status.INFO,
+                    "No active WebDriver instance on current thread to capture screenshot (likely an API test).");
+        }
+    }
+
+    @Override
+    public void onTestSkipped(ITestResult result) {
+        ExtentReportManager.getTest().log(Status.SKIP, "Test Skipped: " + result.getMethod().getMethodName());
+        if (result.getThrowable() != null) {
+            ExtentReportManager.getTest().skip(result.getThrowable());
+        }
     }
 }

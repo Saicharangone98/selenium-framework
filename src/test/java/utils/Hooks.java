@@ -38,20 +38,30 @@ public class Hooks extends BaseTest {
         setupDriver();
     }
 
-    @After
-    public void tearDown(Scenario scenario){
-        System.out.println("Hooks tearDown method is invoked");
-        if (scenario.isFailed()){
-            try{
-                byte[] screenshot = ((TakesScreenshot)DriverFactory.getDriver()).getScreenshotAs(OutputType.BYTES);
-                scenario.attach(screenshot,"image/png",scenario.getName());
+    @After(order = 1)
+    public void tearDownOnFailure(Scenario scenario) {
+        if (scenario.isFailed()) {
+            WebDriver driver = DriverFactory.getDriver();
+            if (driver != null) {
+                // 1. Native Cucumber attachment (for cucumber-html-reports / Extent Spark Cucumber Adapter)
+                byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+                scenario.attach(screenshot, "image/png", "Failure Snapshot: " + scenario.getName());
 
+                // 2. Also save physical file to target/screenshots/ using our utility
+                String sanitizedName = scenario.getName().replaceAll("[^a-zA-Z0-9_-]", "_");
+                ScreenshotUtils.captureToFile(driver, sanitizedName);
 
-            } catch (Exception e) {
-                System.out.println("Failed to take screenshot"+e.getMessage());
+                System.out.println("📸 Captured failure screenshot for Cucumber scenario: " + scenario.getName());
             }
         }
-        tearDownDriver();
+    }
+
+    @After(order = 0)
+    public void quitBrowser() {
+        // Quit browser AFTER screenshot is taken (order 0 runs after order 1)
+        if (DriverFactory.getDriver() != null) {
+            DriverFactory.quitDriver();
+        }
     }
 
     @AfterAll

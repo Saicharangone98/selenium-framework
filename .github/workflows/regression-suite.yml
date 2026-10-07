@@ -54,12 +54,13 @@ jobs:
             -Dheadless=${{ inputs.headless }} \
             -Dexecution.mode=local \
             -DsuiteXmlFile=${{ inputs.suiteXmlFile }}
-      - name: Upload Test Reports & Screenshots
+      - name: Upload Test Results and Failure Screenshots
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: regression-execution-reports
+          name: execution-reports-and-screenshots
           path: |
             test-output/
+            target/screenshots/
             target/surefire-reports/
           retention-days: 14
